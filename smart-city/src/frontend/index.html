@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧城市数字孪生平台</title>
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <header class="top-bar">
+        <div class="logo">
+            <span class="logo-icon">🌐</span>
+            <span class="logo-text">智慧城市数字孪生平台</span>
+            <span class="logo-badge">v2.0</span>
+        </div>
+        <div class="status-group">
+            <div class="status-item">
+                <span class="status-dot green"></span>
+                <span>系统正常</span>
+            </div>
+            <div class="status-item" id="sensor-count">
+                <span class="status-dot blue"></span>
+                <span>传感器: <strong>0</strong>/13</span>
+            </div>
+            <div class="status-item" id="anomaly-count">
+                <span class="status-dot orange"></span>
+                <span>异常: <strong>0</strong></span>
+            </div>
+            <div class="status-item">
+                <span class="status-dot purple"></span>
+                <span>演化引擎: <strong id="evolution-phase">学习中</strong></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主体 -->
+    <main class="main-content">
+        <!-- 左侧: 3D 城市 -->
+        <section class="city-panel">
+            <div id="three-container"></div>
+            <div class="city-overlay">
+                <div class="overlay-title">3D 城市数字孪生</div>
+                <div class="overlay-hint">鼠标拖拽旋转 | 滚轮缩放 | 点击查看详情</div>
+            </div>
+            <!-- 建筑详情弹窗 -->
+            <div id="building-popup" class="popup hidden">
+                <div class="popup-header">
+                    <span id="popup-name"></span>
+                    <button class="popup-close" onclick="closePopup()">✕</button>
+                </div>
+                <div class="popup-body">
+                    <div class="popup-row"><span>类型</span><span id="popup-type"></span></div>
+                    <div class="popup-row"><span>高度</span><span id="popup-height"></span></div>
+                    <div class="popup-row"><span>能耗</span><span id="popup-energy"></span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 右侧: 仪表盘 -->
+        <section class="dashboard-panel">
+            <!-- 交通 -->
+            <div class="dash-card">
+                <div class="card-header">
+                    <span class="card-icon">🚗</span>
+                    <span>交通流量</span>
+                    <span class="card-badge" id="traffic-level">低</span>
+                </div>
+                <div class="card-body">
+                    <canvas id="chart-traffic" height="120"></canvas>
+                    <div class="card-stats">
+                        <div class="stat"><span class="stat-val" id="traffic-avg">0</span><span class="stat-label">平均 辆/h</span></div>
+                        <div class="stat"><span class="stat-val" id="traffic-max">0</span><span class="stat-label">峰值</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 空气质量 -->
+            <div class="dash-card">
+                <div class="card-header">
+                    <span class="card-icon">🌿</span>
+                    <span>空气质量</span>
+                    <span class="card-badge green" id="air-level">优</span>
+                </div>
+                <div class="card-body">
+                    <div class="air-gauge">
+                        <div class="gauge-ring">
+                            <svg viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="50" fill="none" stroke="#1a2a3a" stroke-width="8"/>
+                                <circle id="aqi-arc" cx="60" cy="60" r="50" fill="none" stroke="#00d4ff" stroke-width="8"
+                                    stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round"
+                                    transform="rotate(-90 60 60)"/>
+                            </svg>
+                            <div class="gauge-value"><span id="aqi-val">0</span><small>AQI</small></div>
+                        </div>
+                    </div>
+                    <div class="card-stats">
+                        <div class="stat"><span class="stat-val" id="pm25-val">0</span><span class="stat-label">PM2.5</span></div>
+                        <div class="stat"><span class="stat-val" id="pm10-val">0</span><span class="stat-label">PM10</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 能耗 -->
+            <div class="dash-card">
+                <div class="card-header">
+                    <span class="card-icon">⚡</span>
+                    <span>能源消耗</span>
+                    <span class="card-badge" id="energy-eff">0%</span>
+                </div>
+                <div class="card-body">
+                    <canvas id="chart-energy" height="120"></canvas>
+                    <div class="card-stats">
+                        <div class="stat"><span class="stat-val" id="energy-total">0</span><span class="stat-label">总 kWh</span></div>
+                        <div class="stat"><span class="stat-val" id="energy-avg">0</span><span class="stat-label">均值</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 底部: 自我演化面板 -->
+    <footer class="evolution-panel">
+        <div class="evo-toggle" onclick="toggleEvo()">
+            <span class="evo-icon">🧠</span>
+            <span>自我演化引擎</span>
+            <span class="evo-progress-bar"><span class="evo-fill" id="evo-fill" style="width:0%"></span></span>
+            <span id="evo-pct">0%</span>
+            <span class="evo-arrow" id="evo-arrow">▲</span>
+        </div>
+        <div class="evo-content hidden" id="evo-content">
+            <div class="evo-grid">
+                <!-- 异常记录 -->
+                <div class="evo-section">
+                    <h4>异常检测记录</h4>
+                    <div class="evo-table-wrap">
+                        <table class="evo-table" id="anomaly-table">
+                            <thead><tr><th>时间</th><th>传感器</th><th>数值</th><th>级别</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- 自动生成规则 -->
+                <div class="evo-section">
+                    <h4>自动生成规则</h4>
+                    <div class="evo-table-wrap">
+                        <table class="evo-table" id="rules-table">
+                            <thead><tr><th>条件</th><th>动作</th><th>置信度</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- 演化历史 -->
+                <div class="evo-section">
+                    <h4>演化历史</h4>
+                    <div class="evo-table-wrap">
+                        <table class="evo-table" id="history-table">
+                            <thead><tr><th>迭代</th><th>新规则</th><th>异常</th><th>拥堵</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="static/app.js"></script>
+</body>
+</html>

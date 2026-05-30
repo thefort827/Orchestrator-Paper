@@ -1,0 +1,265 @@
+/* ===== 智慧城市数字孪生 — 深色科技主题 ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --bg: #0a0e1a;
+    --card: rgba(15, 25, 45, 0.85);
+    --card-border: rgba(0, 212, 255, 0.15);
+    --primary: #00d4ff;
+    --primary-dim: rgba(0, 212, 255, 0.2);
+    --green: #00e676;
+    --orange: #ff9100;
+    --red: #ff1744;
+    --purple: #b388ff;
+    --text: #e0e8f0;
+    --text-dim: #7a8a9e;
+    --glass: blur(12px);
+    --radius: 12px;
+    --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+body {
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ===== 顶部导航 ===== */
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 56px;
+    background: var(--card);
+    backdrop-filter: var(--glass);
+    border-bottom: 1px solid var(--card-border);
+    z-index: 100;
+}
+
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon { font-size: 24px; }
+.logo-text { font-size: 18px; font-weight: 700; color: var(--primary); }
+.logo-badge {
+    font-size: 10px; padding: 2px 8px; border-radius: 10px;
+    background: var(--primary-dim); color: var(--primary); font-weight: 600;
+}
+
+.status-group { display: flex; gap: 20px; }
+.status-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-dim); }
+.status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+.status-dot.green { background: var(--green); box-shadow: 0 0 8px var(--green); }
+.status-dot.blue { background: var(--primary); box-shadow: 0 0 8px var(--primary); }
+.status-dot.orange { background: var(--orange); box-shadow: 0 0 8px var(--orange); }
+.status-dot.purple { background: var(--purple); box-shadow: 0 0 8px var(--purple); }
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ===== 主体 ===== */
+.main-content {
+    flex: 1;
+    display: flex;
+    gap: 0;
+    overflow: hidden;
+}
+
+/* 3D 城市面板 */
+.city-panel {
+    flex: 7;
+    position: relative;
+    background: radial-gradient(ellipse at center, #0d1a2a 0%, #0a0e1a 100%);
+}
+
+#three-container {
+    width: 100%;
+    height: 100%;
+}
+
+.city-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: var(--card);
+    backdrop-filter: var(--glass);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 12px 20px;
+}
+.overlay-title { font-size: 14px; font-weight: 600; color: var(--primary); }
+.overlay-hint { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+/* 弹窗 */
+.popup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--card);
+    backdrop-filter: var(--glass);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 0;
+    width: 320px;
+    box-shadow: var(--shadow);
+    z-index: 200;
+    animation: popIn 0.2s ease;
+}
+.popup.hidden { display: none; }
+.popup-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 18px; border-bottom: 1px solid var(--card-border);
+    font-weight: 600; color: var(--primary);
+}
+.popup-close {
+    background: none; border: none; color: var(--text-dim);
+    font-size: 18px; cursor: pointer;
+}
+.popup-close:hover { color: var(--red); }
+.popup-body { padding: 14px 18px; }
+.popup-row {
+    display: flex; justify-content: space-between; padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+}
+.popup-row span:first-child { color: var(--text-dim); }
+.popup-row span:last-child { color: var(--text); font-weight: 500; }
+
+@keyframes popIn {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* ===== 仪表盘面板 ===== */
+.dashboard-panel {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    overflow-y: auto;
+    background: rgba(10, 14, 26, 0.9);
+    border-left: 1px solid var(--card-border);
+}
+
+.dash-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.card-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 16px; font-size: 14px; font-weight: 600;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.card-icon { font-size: 18px; }
+.card-badge {
+    margin-left: auto; font-size: 11px; padding: 2px 10px;
+    border-radius: 10px; background: var(--primary-dim); color: var(--primary);
+}
+.card-badge.green { background: rgba(0, 230, 118, 0.2); color: var(--green); }
+.card-badge.orange { background: rgba(255, 145, 0, 0.2); color: var(--orange); }
+
+.card-body { padding: 12px 16px; }
+
+.card-stats {
+    display: flex; gap: 16px; margin-top: 10px;
+}
+.stat { text-align: center; flex: 1; }
+.stat-val { display: block; font-size: 20px; font-weight: 700; color: var(--primary); }
+.stat-label { font-size: 11px; color: var(--text-dim); }
+
+/* AQI 仪表盘 */
+.air-gauge { display: flex; justify-content: center; padding: 10px 0; }
+.gauge-ring { position: relative; width: 100px; height: 100px; }
+.gauge-ring svg { width: 100%; height: 100%; }
+.gauge-value {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+.gauge-value span { font-size: 24px; font-weight: 700; color: var(--primary); }
+.gauge-value small { display: block; font-size: 10px; color: var(--text-dim); }
+
+/* ===== 底部演化面板 ===== */
+.evo-panel { /* placeholder */ }
+
+.evolution-panel {
+    background: var(--card);
+    border-top: 1px solid var(--card-border);
+    z-index: 100;
+}
+
+.evo-toggle {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 24px; cursor: pointer; font-size: 14px; font-weight: 600;
+    color: var(--purple);
+}
+.evo-icon { font-size: 20px; }
+.evo-progress-bar {
+    width: 200px; height: 6px; background: rgba(255,255,255,0.1);
+    border-radius: 3px; overflow: hidden; margin-left: 12px;
+}
+.evo-fill {
+    height: 100%; background: linear-gradient(90deg, var(--purple), var(--primary));
+    border-radius: 3px; transition: width 0.5s ease;
+}
+.evo-arrow { margin-left: auto; transition: transform 0.3s; }
+.evo-arrow.rotated { transform: rotate(180deg); }
+
+.evo-content { padding: 0 24px 16px; }
+.evo-content.hidden { display: none; }
+
+.evo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+}
+
+.evo-section h4 {
+    font-size: 13px; color: var(--text-dim); margin-bottom: 8px;
+    padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.evo-table-wrap { max-height: 180px; overflow-y: auto; }
+
+.evo-table {
+    width: 100%; border-collapse: collapse; font-size: 12px;
+}
+.evo-table th {
+    text-align: left; padding: 6px 8px; color: var(--text-dim);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    position: sticky; top: 0; background: var(--card);
+}
+.evo-table td {
+    padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.03);
+    color: var(--text);
+}
+.evo-table tr:hover td { background: rgba(0, 212, 255, 0.05); }
+
+.severity-critical { color: var(--red); font-weight: 600; }
+.severity-warning { color: var(--orange); }
+
+/* ===== 滚动条 ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+/* ===== 响应式 ===== */
+@media (max-width: 1024px) {
+    .main-content { flex-direction: column; }
+    .city-panel { flex: none; height: 50vh; }
+    .dashboard-panel { flex: none; height: 30vh; flex-direction: row; overflow-x: auto; }
+    .evo-grid { grid-template-columns: 1fr; }
+}
